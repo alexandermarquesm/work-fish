@@ -13,6 +13,7 @@ A cozy, interactive project manager for the Fish Shell.
 - **🔍 Fuzzy Search**: Integrated with `fzf` for lightning-fast project switching.
 - **🎨 Cozy Aesthetics**: Styled with Lavender, Sage, and Rose pastel colors.
 - **🧩 Smart Completions**: Tab-complete your project names and command flags.
+- **🧹 Auto-Cleanup**: Automatically wipes its universal variables upon uninstallation to keep your system clean.
 - **🛠️ Flexible**: Change your path (`--path`) or editor (`--editor`) anytime.
 
 ## 📦 Installation
@@ -30,7 +31,16 @@ Clone this repository and copy the files:
 ```fish
 cp functions/work.fish ~/.config/fish/functions/
 cp completions/work.fish ~/.config/fish/completions/
+cp conf.d/work.fish ~/.config/fish/conf.d/
 ```
+
+## 🗑️ Uninstallation
+
+If you used **fisher**:
+```fish
+fisher remove alexandermarquesm/work-fish
+```
+*(The tool will automatically clean up its universal variables and say goodbye!)*
 
 ## 🚀 Usage
 
