@@ -4,7 +4,7 @@ A cozy, interactive project manager for the Fish Shell.
 
 `work` is a productivity tool designed to help you jump between your projects instantly using a beautiful, keyboard-navigable interface. It supports automatic editor detection, fuzzy finding (via `fzf`), and is styled with a soft, cozy Catppuccin-inspired palette.
 
-![Banner](https://raw.githubusercontent.com/placeholder/work-fish/main/assets/banner.png) *(Note: Add your own screenshot here!)*
+![Banner](https://raw.githubusercontent.com/alexandermarquesm/work-fish/main/assets/banner.png) *(Note: Add your own screenshot here!)*
 
 ## ✨ Features
 
@@ -20,7 +20,7 @@ A cozy, interactive project manager for the Fish Shell.
 ### Using [fisher](https://github.com/jorgebucaran/fisher) (Recommended)
 
 ```fish
-fisher install your-username/work-fish
+fisher install alexandermarquesm/work-fish
 ```
 
 ### Manual Installation
@@ -57,4 +57,4 @@ Feel free to open issues or pull requests if you have ideas for more "cozy" feat
 
 ## 📄 License
 
-MIT © [Your Name]
+MIT © [Alexander Marques](https://github.com/alexandermarquesm)
