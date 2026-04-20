@@ -12,12 +12,28 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
     set -l c_border 45475a
 
     # --- FUNÇÃO DE AJUDA ---
-    function __work_help -V c_lavender -V c_sage -V c_subtext
+    function __work_help -V c_lavender -V c_sage -V c_subtext -V WORK_PROJECTS_DIR -V WORK_PROJECTS_EDITOR -V c_border -V c_text
         set_color $c_lavender
         echo "╭──────────────────────────────────────────────────╮"
         echo "│                📖 GUIA DO WORK                   │"
         echo "╰──────────────────────────────────────────────────╯"
         set_color normal
+        
+        set_color $c_lavender; printf " [📁] "; set_color $c_text; echo -n "Pasta ativa: "; set_color normal
+        if set -q WORK_PROJECTS_DIR
+            echo "$WORK_PROJECTS_DIR"
+        else
+            set_color $c_subtext; echo "Não configurada"; set_color normal
+        end
+
+        set_color $c_lavender; printf " [⌨️] "; set_color $c_text; echo -n "Editor ativo: "; set_color normal
+        if set -q WORK_PROJECTS_EDITOR
+            echo "$WORK_PROJECTS_EDITOR"
+        else
+            set_color $c_subtext; echo "Não configurado"; set_color normal
+        end
+        set_color $c_border; echo " ──────────────────────────────────────────────────"; set_color normal
+
         echo " Uso: work [projeto] [opções]"
         echo
         set_color $c_sage; echo " Comandos Principais:"; set_color normal
