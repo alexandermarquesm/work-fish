@@ -106,7 +106,7 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
 
     function __work_set_editor -V c_lavender -V c_text -V c_sage
         set_color $c_lavender; printf " [⌨️] "; set_color $c_text; echo "Escolha seu editor favorito:"; set_color normal
-        set -l editors antigravity code codium cursor zed subl nvim vim micro nano emacs kate gedit geany gnome-text-editor mousepad
+        set -l editors antigravity antigravity-ide code codium cursor zed subl lvim lunarvim nvim vim micro nano emacs kate gedit geany gnome-text-editor mousepad
         set -l avail; for e in $editors; if type -q $e; set -a avail $e; end; end
         if test -z "$avail"
             read -p "set_color $c_sage; printf '      [Comando]: '; set_color normal" custom; or return 1
