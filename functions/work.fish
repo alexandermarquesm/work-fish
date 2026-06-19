@@ -40,10 +40,12 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
         echo "   work             Lista projetos (Busca interativa)"
         echo "   work <nome>      Abre o projeto no seu editor"
         echo "   work -n <nome>   Cria e abre um novo projeto"
+        echo "   work -d <nome>   Exclui um projeto (com backup)"
         echo
         set_color $c_subtext; echo " Opções:"; set_color normal
         echo "   work --help      Mostra esta guia"
         echo "   work --new <n>   Cria e abre um novo projeto"
+        echo "   work --delete <n> Exclui um projeto (com backup)"
         echo "   work --path      Troca a pasta de projetos"
         echo "   work --editor    Troca o editor padrão"
         echo "   work --reset     Limpa tudo"
@@ -160,6 +162,45 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
         $WORK_PROJECTS_EDITOR .
     end
 
+    function __work_delete_project -V c_lavender -V c_text -V c_sage -V c_rose -V WORK_PROJECTS_DIR
+        set -l proj_name $argv[1]
+        if test -z "$proj_name"
+            set_color $c_rose; echo "❌ Nome do projeto não fornecido. Uso: work --delete <nome>"; set_color normal
+            return 1
+        end
+
+        set -l project_path "$WORK_PROJECTS_DIR/$proj_name"
+        if not test -d "$project_path"
+            set_color $c_rose; echo "❌ O projeto '$proj_name' não existe em $WORK_PROJECTS_DIR"; set_color normal
+            return 1
+        end
+
+        read -p "set_color $c_rose; printf '⚠️  Tem certeza que deseja excluir o projeto \'$proj_name\'? (s/N): '; set_color normal" confirm
+        if not test "$confirm" = "s" -o "$confirm" = "S" -o "$confirm" = "sim" -o "$confirm" = "Sim" -o "$confirm" = "y" -o "$confirm" = "Y"
+            set_color $c_sage; echo "      ❌ Exclusão cancelada."; set_color normal
+            return 0
+        end
+
+        set -l backup_dir "/tmp/work_backups"
+        mkdir -p "$backup_dir"
+
+        set -l timestamp (date +%Y%m%d_%H%M%S)
+        set -l backup_path "$backup_dir/"$proj_name"_$timestamp"
+
+        set_color $c_lavender; printf " [📦] "; set_color $c_text; echo "Criando backup em $backup_path..."; set_color normal
+        cp -r "$project_path" "$backup_path"
+        if not test -d "$backup_path"
+            set_color $c_rose; echo "❌ Falha ao criar o backup. Abortando exclusão."; set_color normal
+            return 1
+        end
+
+        set_color $c_lavender; printf " [🗑️] "; set_color $c_text; echo "Excluindo projeto '$proj_name'..."; set_color normal
+        rm -rf "$project_path"
+
+        set_color $c_sage; echo "      ✅ Projeto excluído com sucesso!"; set_color normal
+        set_color $c_text; echo "      💡 Backup disponível em: $backup_path"; set_color normal
+    end
+
     # --- LÓGICA PRINCIPAL ---
     switch "$argv[1]"
         case "-h" "--help"; __work_help; return 0
@@ -182,6 +223,9 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
     switch "$argv[1]"
         case "-n" "--new"
             __work_create_project $argv[2]
+            return $status
+        case "-d" "--delete"
+            __work_delete_project $argv[2]
             return $status
     end
 
