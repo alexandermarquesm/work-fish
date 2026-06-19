@@ -39,9 +39,11 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
         set_color $c_sage; echo " Comandos Principais:"; set_color normal
         echo "   work             Lista projetos (Busca interativa)"
         echo "   work <nome>      Abre o projeto no seu editor"
+        echo "   work -n <nome>   Cria e abre um novo projeto"
         echo
         set_color $c_subtext; echo " Opções:"; set_color normal
         echo "   work --help      Mostra esta guia"
+        echo "   work --new <n>   Cria e abre um novo projeto"
         echo "   work --path      Troca a pasta de projetos"
         echo "   work --editor    Troca o editor padrão"
         echo "   work --reset     Limpa tudo"
@@ -122,6 +124,42 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
         end
     end
 
+    function __work_create_project -V c_lavender -V c_text -V c_sage -V c_rose -V WORK_PROJECTS_DIR -V WORK_PROJECTS_EDITOR
+        set -l proj_name $argv[1]
+        if test -z "$proj_name"
+            set_color $c_rose; echo "❌ Nome do projeto não fornecido. Uso: work --new <nome>"; set_color normal
+            return 1
+        end
+
+        set -l project_path "$WORK_PROJECTS_DIR/$proj_name"
+        if test -d "$project_path"
+            set_color $c_rose; echo "❌ O projeto '$proj_name' já existe em $WORK_PROJECTS_DIR"; set_color normal
+            return 1
+        end
+
+        set_color $c_lavender; printf " [🛠️] "; set_color $c_text; echo "Criando projeto '$proj_name'..."; set_color normal
+        mkdir -p "$project_path"
+        if not test -d "$project_path"
+            set_color $c_rose; echo "❌ Não foi possível criar o diretório $project_path"; set_color normal
+            return 1
+        end
+
+        if type -q git
+            read -p "set_color $c_sage; printf '      [Git] Deseja inicializar o repositório Git? (s/N): '; set_color normal" init_git
+            if test "$init_git" = "s" -o "$init_git" = "S" -o "$init_git" = "sim" -o "$init_git" = "Sim" -o "$init_git" = "y" -o "$init_git" = "Y"
+                git -C "$project_path" init >/dev/null
+                set_color $c_sage; echo "      ✅ Repositório Git inicializado."; set_color normal
+            end
+        end
+
+        set_color $c_sage; echo "      ✅ Projeto criado com sucesso!"; set_color normal
+        echo
+
+        set_color $c_lavender; echo "🍵 Abrindo '$proj_name'..."; set_color normal
+        cd "$project_path"
+        $WORK_PROJECTS_EDITOR .
+    end
+
     # --- LÓGICA PRINCIPAL ---
     switch "$argv[1]"
         case "-h" "--help"; __work_help; return 0
@@ -139,6 +177,12 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
         __work_set_editor; or begin; echo; return 1; end
         echo; set_color $c_sage; echo " ✨ Tudo pronto! Bons códigos. ✨"; set_color normal; echo
         return 0
+    end
+
+    switch "$argv[1]"
+        case "-n" "--new"
+            __work_create_project $argv[2]
+            return $status
     end
 
     if count $argv > /dev/null

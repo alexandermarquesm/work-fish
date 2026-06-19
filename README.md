@@ -9,6 +9,7 @@ A cozy, interactive project manager for the Fish Shell.
 ## ✨ Features
 
 - **🚀 Instant Setup**: Run `work` for the first time, and it guides you through a cozy configuration wizard.
+- **🆕 Project Creation**: Instantly create a new project with `work --new <name>` (or `-n <name>`) and optionally initialize a Git repository.
 - **⌨️ Keyboard Navigation**: Select editors using Arrows, `W/S`, or `J/K`.
 - **🔍 Fuzzy Search**: Integrated with `fzf` for lightning-fast project switching.
 - **🎨 Cozy Aesthetics**: Styled with Lavender, Sage, and Rose pastel colors.
@@ -48,6 +49,7 @@ fisher remove alexandermarquesm/work-fish
 |---|---|
 | `work` | Opens the interactive project picker (fzf). |
 | `work <project>` | Directly opens a specific project. |
+| `work -n <project>` / `work --new <project>` | Creates and opens a new project. |
 | `work --help` | Shows the interactive guide. |
 | `work --path` | Change your projects base directory. |
 | `work --editor` | Select a different code editor. |
