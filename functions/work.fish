@@ -39,11 +39,13 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
         set_color $c_sage; echo " Comandos Principais:"; set_color normal
         echo "   work             Lista projetos (Busca interativa)"
         echo "   work <nome>      Abre o projeto no seu editor"
+        echo "   work -c [<nome>] Apenas entra no diretório do projeto"
         echo "   work -n <nome>   Cria e abre um novo projeto"
         echo "   work -d <nome>   Exclui um projeto (com backup)"
         echo
         set_color $c_subtext; echo " Opções:"; set_color normal
         echo "   work --help      Mostra esta guia"
+        echo "   work -c/--cd     Entra no diretório sem abrir o editor"
         echo "   work --new <n>   Cria e abre um novo projeto"
         echo "   work --delete <n> Exclui um projeto (com backup)"
         echo "   work --path      Troca a pasta de projetos"
@@ -157,9 +159,16 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
         set_color $c_sage; echo "      ✅ Projeto criado com sucesso!"; set_color normal
         echo
 
-        set_color $c_lavender; echo "🍵 Abrindo '$proj_name'..."; set_color normal
-        cd "$project_path"
-        $WORK_PROJECTS_EDITOR .
+        if test "$argv[2]" = "1"
+            set_color $c_lavender; echo "📂 Entrando no diretório de '$proj_name'..."; set_color normal
+            cd "$project_path"
+        else
+            set_color $c_lavender; echo "🍵 Abrindo '$proj_name'..."; set_color normal
+            set -l pwd (pwd)
+            cd "$project_path"
+            $WORK_PROJECTS_EDITOR .
+            cd "$pwd"
+        end
     end
 
     function __work_delete_project -V c_lavender -V c_text -V c_sage -V c_rose -V WORK_PROJECTS_DIR
@@ -202,7 +211,18 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
     end
 
     # --- LÓGICA PRINCIPAL ---
-    switch "$argv[1]"
+    set -l cd_only 0
+    set -l cmd_args
+    for arg in $argv
+        switch $arg
+            case "-c" "--cd"
+                set cd_only 1
+            case '*'
+                set -a cmd_args $arg
+        end
+    end
+
+    switch "$cmd_args[1]"
         case "-h" "--help"; __work_help; return 0
         case "--reset"; set -e WORK_PROJECTS_DIR; set -e WORK_PROJECTS_EDITOR; echo "♻️  Configurações limpas."; return 0
         case "--path"; __work_set_path; return 0
@@ -220,23 +240,30 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
         return 0
     end
 
-    switch "$argv[1]"
+    switch "$cmd_args[1]"
         case "-n" "--new"
-            __work_create_project $argv[2]
+            __work_create_project $cmd_args[2] $cd_only
             return $status
         case "-d" "--delete"
-            __work_delete_project $argv[2]
+            __work_delete_project $cmd_args[2]
             return $status
     end
 
-    if count $argv > /dev/null
-        set -l project_path "$WORK_PROJECTS_DIR/$argv[1]"
+    if count $cmd_args > 0
+        set -l project_path "$WORK_PROJECTS_DIR/$cmd_args[1]"
         if test -d "$project_path"
-            set_color $c_lavender; echo "🍵 Abrindo '$argv[1]'..."; set_color normal
-            cd "$project_path"
-            $WORK_PROJECTS_EDITOR .
+            if test $cd_only -eq 1
+                set_color $c_lavender; echo "📂 Entrando no diretório de '$cmd_args[1]'..."; set_color normal
+                cd "$project_path"
+            else
+                set_color $c_lavender; echo "🍵 Abrindo '$cmd_args[1]'..."; set_color normal
+                set -l pwd (pwd)
+                cd "$project_path"
+                $WORK_PROJECTS_EDITOR .
+                cd "$pwd"
+            end
         else
-            set_color $c_rose; echo "❌ Projeto '$argv[1]' não encontrado em $WORK_PROJECTS_DIR"; set_color normal
+            set_color $c_rose; echo "❌ Projeto '$cmd_args[1]' não encontrado em $WORK_PROJECTS_DIR"; set_color normal
         end
     else
         set -l project_list (find "$WORK_PROJECTS_DIR" -maxdepth 1 -mindepth 1 -type d -exec basename {} \;)
@@ -253,8 +280,14 @@ function work --description "Gerencia e abre projetos em seu editor favorito (Co
                 --pointer="❯" \
                 --color="bg+:-1,fg:#cdd6f4,hl:#f38ba8,fg+:#cdd6f4,bg+:-1,hl+:#f38ba8,info:#cba6f7,prompt:#b4befe,pointer:#f5e0dc,marker:#f5e0dc,spinner:#f5e0dc,header:#f38ba8,border:#45475a")
             if test -n "$selection"
-                cd "$WORK_PROJECTS_DIR/$selection"
-                $WORK_PROJECTS_EDITOR .
+                if test $cd_only -eq 1
+                    cd "$WORK_PROJECTS_DIR/$selection"
+                else
+                    set -l pwd (pwd)
+                    cd "$WORK_PROJECTS_DIR/$selection"
+                    $WORK_PROJECTS_EDITOR .
+                    cd "$pwd"
+                end
             end
         else
             echo "📂 Seus projetos:"

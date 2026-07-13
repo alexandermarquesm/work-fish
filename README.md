@@ -50,6 +50,7 @@ fisher remove alexandermarquesm/work-fish
 |---|---|
 | `work` | Opens the interactive project picker (fzf). |
 | `work <project>` | Directly opens a specific project. |
+| `work -c [<project>]` / `work --cd [<project>]` | Only change directory to the project without opening the editor. |
 | `work -n <project>` / `work --new <project>` | Creates and opens a new project. |
 | `work -d <project>` / `work --delete <project>` | Safely deletes a project (moving a backup to `/tmp/work_backups/`). |
 | `work --help` | Shows the interactive guide. |

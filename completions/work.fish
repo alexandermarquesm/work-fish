@@ -17,6 +17,7 @@ complete -c work -n "__fish_prev_arg_in -d --delete" -a "(__work_complete_projec
 
 # Add flags
 complete -c work -l help -d "Show guide and commands"
+complete -c work -s c -l cd -d "Only cd to the project's directory"
 complete -c work -s n -l new -d "Create and open a new project"
 complete -c work -s d -l delete -d "Delete a project (with backup)"
 complete -c work -l path -d "Change projects base directory"
